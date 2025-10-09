@@ -14,6 +14,7 @@ struct ContentView: View {
 
     @StateObject private var vm = ContentViewModel()
     
+    @State private var canProcessTACO: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -38,21 +39,61 @@ struct ContentView: View {
 //                .multilineTextAlignment(.center)
 //                .padding(.horizontal)
 
-            PhotosPicker("Escolher foto", selection: $vm.selectedItem, matching: .images)
+            PhotosPicker("Choose Image", selection: $vm.selectedItem, matching: .images)
                 .buttonStyle(.borderedProminent)
             
             Button {
                 guard let img = $vm.selectedImage.wrappedValue else { return }
-                vm.classify(uiImage: img)
+//                vm.classify(uiImage: img)
+                vm.classifyImageandFetchResults(uiImage: img)
+                
+                canProcessTACO = true
             } label: {
-                Text("Processar Imagem")
+                Text("Process Image")
             }
             .buttonStyle(.borderedProminent)
+            
+            Button {
+                vm.fetchIngredientsFromImage()
+            } label: {
+                Text("Get Ingredients from Image")
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(!canProcessTACO)
 
-            Text($vm.resultText.wrappedValue)
-                .font(Font.largeTitle.bold())
-                .foregroundStyle(.white)
-                .background(.black)
+            Button {
+                vm.analyseMainIngredientOnTACO()
+            } label: {
+                Text("Analyse Ingredient on TACO")
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(!canProcessTACO)
+
+            
+            VStack{
+                List{
+                    ForEach (vm.results) { food in
+                        HStack{
+                            Text("\(food.identifier)")
+                                .font(.title2)
+                            Spacer()
+                            Text("\(food.confidence * 100) %")
+                                .font(.default)
+                        }
+                    }
+                }
+                
+//                Text($vm.testName.wrappedValue)
+//                    .font(Font.caption.bold())
+                
+//                List {
+//                    ForEach () { _ in
+//                    }
+//                }
+            }
+            .bold()
+            .foregroundStyle(.white)
+            .background(.black)
             
             
             Spacer()

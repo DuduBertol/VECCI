@@ -28,8 +28,8 @@ class ContentViewModel: ObservableObject {
 //    @Published var foodNameResult: String = ""
     
     @Published var foodsFindedByModel: [Food] = []
-    @Published var mainFoodAnalysis: FoodAnalysis?
-    @Published var tacoItems: [TacoItem] = []
+    private var mainFoodAnalysis: FoodAnalysis?
+    @Published var tacoResults: [TacoItem] = []
     
 //    @Published var testName: String = "chicken_curry"
     
@@ -52,7 +52,7 @@ class ContentViewModel: ObservableObject {
         }
     }
     
-    func classifyImageandFetchResults(uiImage: UIImage) {
+    private func classifyImageandFetchResults(uiImage: UIImage) {
 //        Task{
             do{
 
@@ -86,8 +86,6 @@ class ContentViewModel: ObservableObject {
                 
                 mainFoodAnalysis = result
                 
-                analyseMainIngredientOnTACO()
-                
             } catch {
                 print(error.localizedDescription)
             }
@@ -95,26 +93,33 @@ class ContentViewModel: ObservableObject {
     }
     
     private func analyseMainIngredientOnTACO() {
-        guard let mainIngredient = mainFoodAnalysis?.ingredients[0] else {
-            print("Main ingredient nil")
-            return
+        guard let mainFoodAnalysis else { return }
+        
+//        guard let mainIngredient = mainFoodAnalysis?.ingredients[0] else {
+//            print("Main ingredient nil")
+//            return
+//        }
+        for ingredient in mainFoodAnalysis.ingredients {
+            guard let tacoItem: TacoItem = tacoService.findClosest(ingredient) else { print("Nil. Não TacoItem"); return}
+            
+            tacoResults.append(tacoItem)
         }
         
-        guard let result: TacoItem = tacoService.findClosest(mainIngredient) else { print("Nil. Não TacoItem"); return}
         
-        print("TACO ITEM")
-        print(result)
+//        guard let result: TacoItem = tacoService.findClosest(mainIngredient) else { print("Nil. Não TacoItem"); return}
+        
+        print("TACO ITEMS")
+        print(tacoResults)
     }
     
-    func doAll(img: UIImage) {
+    func doAllInSequence(foodImage: UIImage) {
             
-        classifyImageandFetchResults(uiImage: img)
+        classifyImageandFetchResults(uiImage: foodImage)
         
         Task {
             await fetchIngredientsFromImage()
             
             analyseMainIngredientOnTACO()
-            
 //            DispatchQueue.main.async{
                 
 //            }

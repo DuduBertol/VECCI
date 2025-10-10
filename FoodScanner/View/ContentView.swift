@@ -5,8 +5,6 @@
 //  Created by Eduardo Bertol on 07/10/25.
 //
 
-
-
 import SwiftUI
 import PhotosUI
 
@@ -19,56 +17,30 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             VStack{
-                if let img = $vm.selectedImage.wrappedValue {
+                if let img = vm.selectedImage {
                     Image(uiImage: img)
                         .resizable()
                         .scaledToFit()
-//                        .frame(maxHeight: 300)
                         .cornerRadius(12)
                         .shadow(radius: 4)
                 } else {
                     Rectangle()
                         .foregroundStyle(.gray)
-//                        .frame(height: 300)
                         .cornerRadius(12)
                         .overlay(Text("preview"))
                 }
             }
-            
-//            Text($vm.resultText.wrappedValue)
-//                .multilineTextAlignment(.center)
-//                .padding(.horizontal)
 
             PhotosPicker("Choose Image", selection: $vm.selectedItem, matching: .images)
                 .buttonStyle(.borderedProminent)
             
             Button {
-                guard let img = $vm.selectedImage.wrappedValue else { return }
-                vm.classifyImageandFetchResults(uiImage: img)
-                
-//                vm.doAll(img: img)
-                
-//                canProcessTACO = true
+                guard let img = vm.selectedImage else { return }
+                vm.doAllInSequence(foodImage: img)
             } label: {
                 Text("Process Image")
             }
             .buttonStyle(.borderedProminent)
-            
-//            Button {
-//                vm.fetchIngredientsFromImage()
-//            } label: {
-//                Text("Get Ingredients from Image")
-//            }
-//            .buttonStyle(.borderedProminent)
-//            .disabled(!canProcessTACO)
-//
-//            Button {
-//                vm.analyseMainIngredientOnTACO()
-//            } label: {
-//                Text("Analyse Ingredient on TACO")
-//            }
-//            .buttonStyle(.borderedProminent)
-//            .disabled(!canProcessTACO)
 
             
             VStack{
@@ -76,26 +48,57 @@ struct ContentView: View {
                     ForEach (vm.foodsFindedByModel) { food in
                         HStack{
                             Text("\(food.identifier)")
-                                .font(.title2)
+                                .font(.default)
                             Spacer()
                             Text("\(food.confidence * 100) %")
-                                .font(.default)
+                                .font(.caption)
                         }
                     }
-                    
-//                    ForEach (vm.mainFoodAnalysis?.ingredients) { ingredient in
-//                        Text("\(ingredient)")
-//                            .font(.title2)
-//                    }
+                }
+                .padding()
+                
+                List{
+                    ForEach (vm.tacoResults) { taco in
+                        HStack{
+                            Text("\(taco.nome)")
+                                .font(.default)
+                            Spacer()
+
+                            VStack{
+                                HStack{
+                                    Text("Calories")
+                                    Spacer()
+                                    Text("\(String(format: "%.1f", taco.energiaKcal)) Kcal")
+                                }
+
+                                
+                                HStack{
+                                    Text("Proteinas")
+                                    Spacer()
+                                    Text("\(String(format: "%.1f", taco.proteina)) Kcal")
+                                }
+                                
+                                
+                                HStack{
+                                    Text("Lipideos")
+                                    Spacer()
+                                    Text("\(String(format: "%.1f", taco.lipideos)) Kcal")
+                                }
+                                
+                                
+                                HStack{
+                                    Text("Carbos")
+                                    Spacer()
+                                    Text("\(String(format: "%.1f", taco.carboidratos)) Kcal")
+                                }
+                            }
+                            .frame(maxWidth: 150)
+                            .font(.caption)
+                        }
+                    }
                 }
                 
-//                Text($vm.testName.wrappedValue)
-//                    .font(Font.caption.bold())
                 
-//                List {
-//                    ForEach () { _ in
-//                    }
-//                }
             }
             .bold()
             .foregroundStyle(.white)

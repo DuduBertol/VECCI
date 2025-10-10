@@ -21,7 +21,7 @@ final class TacoService: ObservableObject {
     @Published var items: [TacoItem] = []
     
     init() {
-        loadTacoCSV(named: "TabelaTACO") // o arquivo taco.csv deve estar no bundle
+        loadTacoCSV(named: "TabelaTACO-Completa") // o arquivo taco.csv deve estar no bundle
     }
     
     func loadTacoCSV(named fileName: String) {

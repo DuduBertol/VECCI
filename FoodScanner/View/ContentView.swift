@@ -23,13 +23,13 @@ struct ContentView: View {
                     Image(uiImage: img)
                         .resizable()
                         .scaledToFit()
-                        .frame(maxHeight: 300)
+//                        .frame(maxHeight: 300)
                         .cornerRadius(12)
                         .shadow(radius: 4)
                 } else {
                     Rectangle()
                         .foregroundStyle(.gray)
-                        .frame(height: 300)
+//                        .frame(height: 300)
                         .cornerRadius(12)
                         .overlay(Text("preview"))
                 }
@@ -44,35 +44,36 @@ struct ContentView: View {
             
             Button {
                 guard let img = $vm.selectedImage.wrappedValue else { return }
-//                vm.classify(uiImage: img)
                 vm.classifyImageandFetchResults(uiImage: img)
                 
-                canProcessTACO = true
+//                vm.doAll(img: img)
+                
+//                canProcessTACO = true
             } label: {
                 Text("Process Image")
             }
             .buttonStyle(.borderedProminent)
             
-            Button {
-                vm.fetchIngredientsFromImage()
-            } label: {
-                Text("Get Ingredients from Image")
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(!canProcessTACO)
-
-            Button {
-                vm.analyseMainIngredientOnTACO()
-            } label: {
-                Text("Analyse Ingredient on TACO")
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(!canProcessTACO)
+//            Button {
+//                vm.fetchIngredientsFromImage()
+//            } label: {
+//                Text("Get Ingredients from Image")
+//            }
+//            .buttonStyle(.borderedProminent)
+//            .disabled(!canProcessTACO)
+//
+//            Button {
+//                vm.analyseMainIngredientOnTACO()
+//            } label: {
+//                Text("Analyse Ingredient on TACO")
+//            }
+//            .buttonStyle(.borderedProminent)
+//            .disabled(!canProcessTACO)
 
             
             VStack{
                 List{
-                    ForEach (vm.results) { food in
+                    ForEach (vm.foodsFindedByModel) { food in
                         HStack{
                             Text("\(food.identifier)")
                                 .font(.title2)
@@ -81,6 +82,11 @@ struct ContentView: View {
                                 .font(.default)
                         }
                     }
+                    
+//                    ForEach (vm.mainFoodAnalysis?.ingredients) { ingredient in
+//                        Text("\(ingredient)")
+//                            .font(.title2)
+//                    }
                 }
                 
 //                Text($vm.testName.wrappedValue)
@@ -109,3 +115,6 @@ struct ContentView: View {
 
 }
 
+#Preview {
+    ContentView()
+}

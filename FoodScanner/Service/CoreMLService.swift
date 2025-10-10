@@ -61,8 +61,8 @@ class CoreMLService {
             
             tempResults = [
                 Food(identifier: identifier1, confidence: confidence1),
-                Food(identifier: identifier2, confidence: confidence2),
-                Food(identifier: identifier3, confidence: confidence3),
+//                Food(identifier: identifier2, confidence: confidence2),
+//                Food(identifier: identifier3, confidence: confidence3),
             ]
         }
         
@@ -77,9 +77,9 @@ class CoreMLService {
 
 struct Food: Identifiable, Codable {
     let id: UUID
-    let identifier: String
-    let formattedName: String?
-    let confidence: Float
+    var identifier: String
+//    let formattedName: String?
+    var confidence: Float
     
     init(
         identifier: String,
@@ -87,7 +87,11 @@ struct Food: Identifiable, Codable {
     ){
         self.id = UUID()
         self.identifier = identifier
-        self.formattedName = nil
+//        self.formattedName = nil
         self.confidence = confidence
+    }
+    
+    func getName() -> String {
+        identifier
     }
 }

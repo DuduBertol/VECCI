@@ -2,8 +2,9 @@
 //  ContentViewModel.swift
 //  FoodScanner
 //
-//  Created by Eduardo Bertol on 07/10/25.
+//  Created by Eduardo Bertol on 10/10/25.
 //
+
 
 import Foundation
 import Combine
@@ -26,8 +27,9 @@ class ContentViewModel: ObservableObject {
     @Published var selectedImage: UIImage?
 //    @Published var foodNameResult: String = ""
     
-    @Published var results: [Food] = []
+    @Published var foodsFindedByModel: [Food] = []
     @Published var mainFoodAnalysis: FoodAnalysis?
+    @Published var tacoItems: [TacoItem] = []
     
 //    @Published var testName: String = "chicken_curry"
     
@@ -51,15 +53,15 @@ class ContentViewModel: ObservableObject {
     }
     
     func classifyImageandFetchResults(uiImage: UIImage) {
-        Task{
+//        Task{
             do{
 
-                results = try coreMLService.classify(uiImage)
+                foodsFindedByModel = try coreMLService.classify(uiImage)
             } catch {
                 print("Algum erro na classificação")
                 print(error.localizedDescription)
             }
-        }
+//        }
     }
     
 //    func simulatedPromt() {
@@ -72,11 +74,11 @@ class ContentViewModel: ObservableObject {
 //        }
 //    }
     
-    func fetchIngredientsFromImage() {
-        guard let foodName = results.first?.identifier else { return }
+    private func fetchIngredientsFromImage() async {
+        guard let foodName = foodsFindedByModel.first?.identifier else { return }
         
     
-        Task {
+//        Task {
             do{
                 let result = try await foundationModelService.analyzeFood(foodName)
                 print("INGREDIENTES:")
@@ -84,13 +86,15 @@ class ContentViewModel: ObservableObject {
                 
                 mainFoodAnalysis = result
                 
+                analyseMainIngredientOnTACO()
+                
             } catch {
                 print(error.localizedDescription)
             }
-        }
+//        }
     }
     
-    func analyseMainIngredientOnTACO() {
+    private func analyseMainIngredientOnTACO() {
         guard let mainIngredient = mainFoodAnalysis?.ingredients[0] else {
             print("Main ingredient nil")
             return
@@ -100,5 +104,22 @@ class ContentViewModel: ObservableObject {
         
         print("TACO ITEM")
         print(result)
+    }
+    
+    func doAll(img: UIImage) {
+            
+        classifyImageandFetchResults(uiImage: img)
+        
+        Task {
+            await fetchIngredientsFromImage()
+            
+            analyseMainIngredientOnTACO()
+            
+//            DispatchQueue.main.async{
+                
+//            }
+        }
+        
+        
     }
 }

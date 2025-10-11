@@ -10,11 +10,18 @@ import Combine
 
 struct TacoItem: Identifiable, Codable {
     let id = UUID()
+    
     let nome: String
     let energiaKcal: Double
     let proteina: Double
     let lipideos: Double
     let carboidratos: Double
+}
+
+extension TacoItem {
+    static func mockEmpty() -> TacoItem {
+        TacoItem(nome: "None", energiaKcal: 0, proteina: 0, lipideos: 0, carboidratos: 0)
+    }
 }
 
 final class TacoService: ObservableObject {

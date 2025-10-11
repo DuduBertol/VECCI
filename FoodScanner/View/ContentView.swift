@@ -9,42 +9,42 @@ import SwiftUI
 import PhotosUI
 
 struct ContentView: View {
-
+    
     @StateObject private var vm = ContentViewModel()
     
     @State private var canProcessTACO: Bool = false
     
     var body: some View {
         NavigationStack {
-            VStack{
-                if let img = vm.selectedImage {
-                    Image(uiImage: img)
-                        .resizable()
-                        .scaledToFit()
-                        .cornerRadius(12)
-                        .shadow(radius: 4)
-                } else {
-                    Rectangle()
-                        .foregroundStyle(.gray)
-                        .cornerRadius(12)
-                        .overlay(Text("preview"))
+            ScrollView{
+                VStack{
+                    if let img = vm.selectedImage {
+                        Image(uiImage: img)
+                            .resizable()
+                            .scaledToFit()
+                            .cornerRadius(12)
+                            .shadow(radius: 4)
+                    } else {
+                        Rectangle()
+                            .foregroundStyle(.gray)
+                            .cornerRadius(12)
+                            .overlay(Text("preview"))
+                    }
                 }
-            }
-
-            PhotosPicker("Choose Image", selection: $vm.selectedItem, matching: .images)
+                
+                PhotosPicker("Choose Image", selection: $vm.selectedItem, matching: .images)
+                    .buttonStyle(.borderedProminent)
+                
+                Button {
+                    guard let img = vm.selectedImage else { return }
+                    vm.doAllInSequence(foodImage: img)
+                } label: {
+                    Text("Process Image")
+                }
                 .buttonStyle(.borderedProminent)
-            
-            Button {
-                guard let img = vm.selectedImage else { return }
-                vm.doAllInSequence(foodImage: img)
-            } label: {
-                Text("Process Image")
-            }
-            .buttonStyle(.borderedProminent)
-
-            
-            VStack{
-                List{
+                
+                
+                VStack{
                     ForEach (vm.foodsFindedByModel) { food in
                         HStack{
                             Text("\(food.identifier)")
@@ -54,23 +54,20 @@ struct ContentView: View {
                                 .font(.caption)
                         }
                     }
-                }
-                .padding()
-                
-                List{
+                    
                     ForEach (vm.tacoResults) { taco in
                         HStack{
                             Text("\(taco.nome)")
                                 .font(.default)
                             Spacer()
-
+                            
                             VStack{
                                 HStack{
                                     Text("Calories")
                                     Spacer()
                                     Text("\(String(format: "%.1f", taco.energiaKcal)) Kcal")
                                 }
-
+                                
                                 
                                 HStack{
                                     Text("Proteinas")
@@ -96,18 +93,13 @@ struct ContentView: View {
                             .font(.caption)
                         }
                     }
+                    
                 }
+                .bold()
                 
                 
-            }
-            .bold()
-            .foregroundStyle(.white)
-            .background(.black)
-            
-            
-            Spacer()
-        }
-        .background(.white)
+                Spacer()
+            }}
         .padding()
         .onChange(of: vm.selectedItem) { oldValue, newValue in
             guard let newValue else { return }
@@ -115,9 +107,10 @@ struct ContentView: View {
         }
     }
     
-
+    
 }
 
 #Preview {
     ContentView()
 }
+

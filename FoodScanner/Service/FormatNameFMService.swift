@@ -34,7 +34,7 @@ class FormatNameFMService {
     func formatName(_ name: String) async throws -> String {
         
 //        let prompt = "Formate o nome desse alimento para português: \(name)"
-        let prompt = "Traduza para português: \(name) e me retorne somente o nome do alimento:"
+        let prompt = "Traduza para português: \(name) e me retorne somente o nome do alimento, sem textos além dele."
         
         guard let session = session else {
             throw AnalysisError.sessionNotInitialized
@@ -42,6 +42,7 @@ class FormatNameFMService {
         
         let response = try await session.respond(to: prompt)
         
+        print("Nome formatado: \(response.content.description)")
         return response.content.description
     }
 }

@@ -16,6 +16,10 @@ class FoundationModelService {
     
     init() {
         
+        setupSession()
+    }
+    
+    func setupSession() {
         let instructions = """
         Você é um especialista em nutrição e análise de alimentos brasileiros.
         Sua função é analisar imagens de refeições e identificar:
@@ -24,10 +28,17 @@ class FoundationModelService {
         
         Forneça respostas em formato JSON estruturado.
         Use nomes de alimentos compatíveis com a Tabela TACO brasileira.
-        Seja preciso mas conservador nas estimativas de peso.
+        Os nomes devem estar em Português brasileiro.
+        Os nomes devem conter apenas uma ou duas palavras.
+        Seja conservador nas estimativas de peso, estimando para menos.
         """
         
         session = LanguageModelSession(instructions: instructions)
+        
+    }
+    
+    func quitSession() {
+        session = nil
     }
     
     func analyzeFood(_ name: String) async throws -> FoodAnalysis {

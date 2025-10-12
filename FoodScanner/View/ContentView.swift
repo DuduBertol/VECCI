@@ -45,54 +45,53 @@ struct ContentView: View {
                 
                 
                 VStack{
-                    ForEach (vm.foodsFindedByModel) { food in
-                        HStack{
-                            Text("\(food.identifier)")
-                                .font(.default)
-                            Spacer()
-                            Text("\(food.confidence * 100) %")
-                                .font(.caption)
-                        }
+                    HStack{
+                        Text("\($vm.foodTotalTacoResult.translatedName.wrappedValue)")
+                            .font(.default)
+                        Spacer()
+                        Text("\(String(format: "%.1f", $vm.foodTotalTacoResult.confidence.wrappedValue * 100)) %")
+                            .font(.caption)
+                        Text("\(String(format: "%.1f", $vm.foodTotalTacoResult.totalWeight_g.wrappedValue)) g")
+                            .font(.caption)
                     }
                     
-                    ForEach (vm.tacoResults) { taco in
+                    VStack{
                         HStack{
-                            Text("\(taco.nome)")
-                                .font(.default)
+                            Text("Calorias")
                             Spacer()
-                            
-                            VStack{
-                                HStack{
-                                    Text("Calories")
-                                    Spacer()
-                                    Text("\(String(format: "%.1f", taco.energiaKcal)) Kcal")
-                                }
-                                
-                                
-                                HStack{
-                                    Text("Proteinas")
-                                    Spacer()
-                                    Text("\(String(format: "%.1f", taco.proteina)) Kcal")
-                                }
-                                
-                                
-                                HStack{
-                                    Text("Lipideos")
-                                    Spacer()
-                                    Text("\(String(format: "%.1f", taco.lipideos)) Kcal")
-                                }
-                                
-                                
-                                HStack{
-                                    Text("Carbos")
-                                    Spacer()
-                                    Text("\(String(format: "%.1f", taco.carboidratos)) Kcal")
-                                }
-                            }
-                            .frame(maxWidth: 150)
-                            .font(.caption)
+                            Text("\(String(format: "%.1f", $vm.foodTotalTacoResult.calories_kcal.wrappedValue)) Kcal")
                         }
+                        
+                        
+                        HStack{
+                            Text("Proteínas")
+                            Spacer()
+                            Text("\(String(format: "%.1f", $vm.foodTotalTacoResult.proteins_g.wrappedValue)) g")
+                        }
+                        
+                        HStack{
+                            Text("Carboidratos")
+                            Spacer()
+                            Text("\(String(format: "%.1f", $vm.foodTotalTacoResult.carbohydrates_g.wrappedValue)) g")
+                        }
+
+                        
+                        HStack{
+                            Text("Lipideos")
+                            Spacer()
+                            Text("\(String(format: "%.1f", $vm.foodTotalTacoResult.fats_g.wrappedValue)) g")
+                        }
+
+                        HStack{
+                            Text("Fibras")
+                            Spacer()
+                            Text("\(String(format: "%.1f", $vm.foodTotalTacoResult.fibers_g.wrappedValue)) g")
+                        }
+                        
+                        
                     }
+                    .frame(maxWidth: 150)
+                    .font(.caption)
                     
                 }
                 .bold()

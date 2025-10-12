@@ -10,9 +10,7 @@ import CoreML
 import Vision
 import UIKit
 
-enum MLModelAvailableType {
-    case foodClassifier, vecci
-}
+
 
 class CoreMLService {
     
@@ -85,23 +83,4 @@ class CoreMLService {
     }
 }
 
-struct Food: Identifiable, Codable {
-    let id: UUID
-    var identifier: String
-//    let formattedName: String?
-    var confidence: Float
-    
-    init(
-        identifier: String,
-        confidence: Float
-    ){
-        self.id = UUID()
-        self.identifier = identifier
-//        self.formattedName = nil
-        self.confidence = confidence
-    }
-    
-    func getName() -> String {
-        identifier
-    }
-}
+

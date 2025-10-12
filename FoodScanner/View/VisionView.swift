@@ -10,26 +10,29 @@ import PhotosUI
 
 struct VisionView: View {
     
-    @StateObject private var vm = ContentViewModel()
+    @StateObject private var vm = VisionViewModel()
     
     @State private var isDisabledAnalyseButton: Bool = true
     @State private var showInfoSheet: Bool = false
     
     var body: some View {
-        ZStack{
-            VStack{
+        NavigationStack{
+            
+            ZStack{
+                
+                //MARK: - IMAGEM
                 VStack{
                     if let img = vm.selectedImage {
                         Image(uiImage: img)
                             .resizable()
                             .scaledToFill()
-                            .frame(maxWidth: 420, maxHeight: 400)
+                            .frame(maxWidth: 405, maxHeight: 400)
                             .cornerRadius(16)
                             .shadow(radius: 4)
                     } else {
                         Rectangle()
                             .foregroundStyle(.gray.opacity(0.5))
-                            .frame(width: 400, height: 400)
+                            .frame(width: 405, height: 400)
                             .cornerRadius(16)
                             .overlay(
                                 Image(systemName: "photo")
@@ -37,69 +40,89 @@ struct VisionView: View {
                                     .foregroundStyle(.white)
                             )
                     }
+                    Spacer()
                 }
                 .ignoresSafeArea()
-    //            .border(.blue)
                 
-                if vm.foodTotalTacoResult.translatedName != "None"{
-                    VStack(alignment: .center, spacing: 16){
+                //MARK: - CONTENT
+                VStack{
+                    VStack{
+                        Rectangle()
+                            .foregroundStyle(.clear)
+                    }
+                    .frame(height: 300)
+                    
+                    if vm.foodTotalTacoResult.translatedName != "None"{
+                        VStack(alignment: .center, spacing: 16){
+                            VStack{
+                                Text($vm.foodTotalTacoResult.translatedName.wrappedValue)
+                                    .font(.title2)
+                                    .bold()
+                                    .padding(.vertical)
+                                    .padding(.horizontal, 16)
+                                    .glassEffect()
+                                Text("esta é uma estimativa hipotética (\(String(format: "%.1f", $vm.foodTotalTacoResult.confidence.wrappedValue * 100)))% para - \(String(format: "%.1f", $vm.foodTotalTacoResult.totalWeight_g.wrappedValue)) g")
+                                    .foregroundStyle(.opacity(0.25))
+                                    .font(.caption)
+                            }
+                            VStack{
+                                NumberStatsRowView(title: "Calorias", amount: $vm.foodTotalTacoResult.calories_kcal.wrappedValue, unit: "Kcal")
+                                NumberStatsRowView(title: "Proteínas", amount: $vm.foodTotalTacoResult.proteins_g.wrappedValue)
+                                NumberStatsRowView(title: "Carboidratos", amount: $vm.foodTotalTacoResult.carbohydrates_g.wrappedValue)
+                                NumberStatsRowView(title: "Gorduras", amount: $vm.foodTotalTacoResult.fats_g.wrappedValue)
+                                NumberStatsRowView(title: "Fibras", amount: $vm.foodTotalTacoResult.fibers_g.wrappedValue)
+                            }
+                        }
+                        .padding(.horizontal, 32)
+                        
+                    } else {
                         VStack{
-                            Text($vm.foodTotalTacoResult.translatedName.wrappedValue)
+                            Text("Adicione uma foto")
                                 .font(.title2)
                                 .bold()
                                 .padding(.vertical)
                                 .padding(.horizontal, 16)
                                 .glassEffect()
-                            Text("esta é uma estimativa hipotética (\(String(format: "%.1f", $vm.foodTotalTacoResult.confidence.wrappedValue * 100)))% para - \(String(format: "%.1f", $vm.foodTotalTacoResult.totalWeight_g.wrappedValue)) g")
-                                .foregroundStyle(.opacity(0.25))
-                                .font(.caption)
-                                
-                        }
-                        
-                        VStack{
-                            NumberStatsRowView(title: "Calorias", amount: $vm.foodTotalTacoResult.calories_kcal.wrappedValue, unit: "Kcal")
-                            NumberStatsRowView(title: "Proteínas", amount: $vm.foodTotalTacoResult.proteins_g.wrappedValue)
-                            NumberStatsRowView(title: "Carboidratos", amount: $vm.foodTotalTacoResult.carbohydrates_g.wrappedValue)
-                            NumberStatsRowView(title: "Gorduras", amount: $vm.foodTotalTacoResult.fats_g.wrappedValue)
-                            NumberStatsRowView(title: "Fibras", amount: $vm.foodTotalTacoResult.fibers_g.wrappedValue)
-                        }
-                        
-                        
-                    }
-                    .offset(y: -54)
-                    .padding(.horizontal, 32)
-                } else {
-                    VStack{
-                        Text("Adicione uma foto")
-                            .font(.title2)
-                            .bold()
-                            .padding(.vertical)
-                            .padding(.horizontal, 16)
-                            .glassEffect()
-                            .glassEffectTransition(.identity)
-                        Text("então clique no 'olho' para analisar.")
-                            .foregroundStyle(.opacity(0.5))
-                            .font(.footnote)
+                                .glassEffectTransition(.identity)
+                            Text("então clique no 'olho' para analisar.")
+                                .foregroundStyle(.opacity(0.5))
+                                .font(.footnote)
+                            Spacer()
                             
+                        }
+                        .padding(.horizontal, 16)
                     }
-                    .offset(y: -54)
-                    .padding(.horizontal, 16)
+                    
+                    Spacer()
                 }
-    //            .border(.red)
-                Spacer()
                 
+                //MARK: - LOADING
+                VStack{
+                    Spacer()
+                    if $vm.isLoading.wrappedValue {
+                        HStack{
+                            Spacer()
+                            SpinningLoader()
+                        }
+                        .padding(.trailing, 32)
+                    }
+                }
+                .offset(y: 32)
             }
-            VStack{
-                
-                HStack(){
+            
+            
+            //MARK: - TOP TOOLBAR
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
                     Button{
                         showInfoSheet = true
                     } label: {
                         Image(systemName: "info.circle")
                             .font(.system(size: 16, weight: .semibold))
                     }
-                    .buttonStyle(.glass)
-                    Spacer()
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
                     Menu(){
                         Menu("Modelo"){
                             Button("FoodClassifier (101 Classes)"){
@@ -113,40 +136,34 @@ struct VisionView: View {
                         Image(systemName: "gear")
                             .font(.system(size: 16, weight: .semibold))
                     }
-                    .buttonStyle(.glass)
                     
                 }
-                .padding(.horizontal, 32)
+            }
+            
+            //MARK: - BOTTOM TOOLBAR
+            .toolbar {
+                ToolbarItem(placement: .bottomBar) {
+                    PhotosPicker(selection: $vm.selectedItem, matching: .images){
+                        Image(systemName: "photo.badge.plus")
+                            .font(.system(size: 19, weight: .semibold))
+                    }
+                    .buttonStyle(.glassProminent)
+                }
                 
-                Spacer()
-                ZStack{
-                    HStack{
-                        PhotosPicker(selection: $vm.selectedItem, matching: .images){
-                            Image(systemName: "photo.badge.plus")
-                                .font(.system(size: 19, weight: .semibold))
-                        }
-                        .buttonStyle(.glassProminent)
-                        
-                        Button {
-                            guard let img = vm.selectedImage else { return }
-                            vm.doAllInSequence(foodImage: img)
-                        } label: {
-                            Image(systemName: "eye")
-                                .font(.system(size: 19, weight: .semibold))
-                        }
-                        .disabled(isDisabledAnalyseButton)
-                        .buttonStyle(.glassProminent)
+                ToolbarItem(placement: .bottomBar) {
+                    Button {
+                        guard let img = vm.selectedImage else { return }
+                        vm.doAllInSequence(foodImage: img)
+                    } label: {
+                        Image(systemName: "eye")
+                            .font(.system(size: 19, weight: .semibold))
                     }
-                    if $vm.isLoading.wrappedValue {
-                        HStack{
-                            Spacer()
-                            SpinningLoader()
-                        }
-                        .padding(.trailing, 32)
-                    }
+                    .disabled(isDisabledAnalyseButton)
+                    .buttonStyle(.glassProminent)
                 }
             }
         }
+        //MARK: - VIEW MODIFIERS
         .onChange(of: vm.selectedImage) { oldValue, newValue in
             guard newValue != nil else { return }
             
@@ -169,72 +186,3 @@ struct VisionView: View {
     VisionView()
 }
 
-struct NumberStatsRowView: View {
-    
-    var title: String
-    var amount: Double
-    var unit: String = "g"
-    
-    
-    var body: some View {
-        HStack{
-            Text(title)
-                .font(.body)
-                .frame(width: 175)
-                .padding(.vertical, 12)
-                .glassEffect()
-            
-            Spacer()
-            
-            Text("\(String(format: "%.1f", amount)) \(unit)")
-                .font(.subheadline)
-                .bold()
-                .frame(width: 100)
-                .padding(.vertical, 12)
-                .glassEffect()
-        }
-    }
-}
-
-struct TextStatsRowView: View {
-    
-    var title: String
-    var content: String
-    
-    
-    var body: some View {
-        HStack{
-            Text(title)
-                .font(.body)
-                .frame(width: 175)
-                .padding(.vertical, 12)
-                .glassEffect()
-            
-            Spacer()
-            
-            Text(content)
-                .font(.subheadline)
-                .bold()
-                .frame(width: 100)
-                .padding(.vertical, 12)
-                .glassEffect()
-        }
-    }
-}
-
-struct SpinningLoader: View {
-    @State private var rotationDegrees: Double = 0
-
-    var body: some View {
-        Circle()
-            .trim(from: 0, to: 0.7) // Creates an arc
-            .stroke(Color.blue, lineWidth: 2)
-            .frame(width: 10, height: 10)
-            .rotationEffect(.degrees(rotationDegrees))
-            .onAppear {
-                withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
-                    rotationDegrees = 360 // Animate rotation
-                }
-            }
-    }
-}

@@ -13,7 +13,7 @@ import Vision
 import SwiftUI
 import PhotosUI
 
-class ContentViewModel: ObservableObject {
+class VisionViewModel: ObservableObject {
     
     private var coreMLService = CoreMLService()
     private var foundationModelService = FoundationModelService()

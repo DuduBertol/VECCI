@@ -13,6 +13,7 @@ struct VisionView: View {
     @StateObject private var vm = ContentViewModel()
     
     @State private var isDisabledAnalyseButton: Bool = true
+    @State private var showInfoSheet: Bool = false
     
     var body: some View {
         ZStack{
@@ -22,7 +23,7 @@ struct VisionView: View {
                         Image(uiImage: img)
                             .resizable()
                             .scaledToFill()
-                            .frame(maxHeight: 400)
+                            .frame(maxWidth: 420, maxHeight: 400)
                             .cornerRadius(16)
                             .shadow(radius: 4)
                     } else {
@@ -49,18 +50,18 @@ struct VisionView: View {
                                 .padding(.vertical)
                                 .padding(.horizontal, 16)
                                 .glassEffect()
-                            Text("esta é uma estimativa hipotética para - \(String(format: "%.1f", $vm.foodTotalTacoResult.totalWeight_g.wrappedValue)) g")
+                            Text("esta é uma estimativa hipotética (\(String(format: "%.1f", $vm.foodTotalTacoResult.confidence.wrappedValue * 100)))% para - \(String(format: "%.1f", $vm.foodTotalTacoResult.totalWeight_g.wrappedValue)) g")
                                 .foregroundStyle(.opacity(0.25))
-                                .font(.footnote)
+                                .font(.caption)
                                 
                         }
                         
                         VStack{
-                            StatsRowView(title: "Calorias", amount: $vm.foodTotalTacoResult.calories_kcal.wrappedValue, unit: "Kcal")
-                            StatsRowView(title: "Proteínas", amount: $vm.foodTotalTacoResult.proteins_g.wrappedValue)
-                            StatsRowView(title: "Carboidratos", amount: $vm.foodTotalTacoResult.carbohydrates_g.wrappedValue)
-                            StatsRowView(title: "Gorduras", amount: $vm.foodTotalTacoResult.fats_g.wrappedValue)
-                            StatsRowView(title: "Fibras", amount: $vm.foodTotalTacoResult.fibers_g.wrappedValue)
+                            NumberStatsRowView(title: "Calorias", amount: $vm.foodTotalTacoResult.calories_kcal.wrappedValue, unit: "Kcal")
+                            NumberStatsRowView(title: "Proteínas", amount: $vm.foodTotalTacoResult.proteins_g.wrappedValue)
+                            NumberStatsRowView(title: "Carboidratos", amount: $vm.foodTotalTacoResult.carbohydrates_g.wrappedValue)
+                            NumberStatsRowView(title: "Gorduras", amount: $vm.foodTotalTacoResult.fats_g.wrappedValue)
+                            NumberStatsRowView(title: "Fibras", amount: $vm.foodTotalTacoResult.fibers_g.wrappedValue)
                         }
                         
                         
@@ -69,14 +70,14 @@ struct VisionView: View {
                     .padding(.horizontal, 32)
                 } else {
                     VStack{
-                        Text("Upload a food photo")
+                        Text("Adicione uma foto")
                             .font(.title2)
                             .bold()
                             .padding(.vertical)
                             .padding(.horizontal, 16)
                             .glassEffect()
                             .glassEffectTransition(.identity)
-                        Text("then click in the 'eye' to Inspect.")
+                        Text("então clique no 'olho' para analisar.")
                             .foregroundStyle(.opacity(0.5))
                             .font(.footnote)
                             
@@ -89,6 +90,34 @@ struct VisionView: View {
                 
             }
             VStack{
+                
+                HStack(){
+                    Button{
+                        showInfoSheet = true
+                    } label: {
+                        Image(systemName: "info.circle")
+                            .font(.system(size: 16, weight: .semibold))
+                    }
+                    .buttonStyle(.glass)
+                    Spacer()
+                    Menu(){
+                        Menu("Modelo"){
+                            Button("FoodClassifier (101 Classes)"){
+                                vm.setMLModel(to: .foodClassifier)
+                            }
+                            Button("VECCI (174 Classes)"){
+                                vm.setMLModel(to: .vecci)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "gear")
+                            .font(.system(size: 16, weight: .semibold))
+                    }
+                    .buttonStyle(.glass)
+                    
+                }
+                .padding(.horizontal, 32)
+                
                 Spacer()
                 ZStack{
                     HStack{
@@ -96,9 +125,7 @@ struct VisionView: View {
                             Image(systemName: "photo.badge.plus")
                                 .font(.system(size: 19, weight: .semibold))
                         }
-                        .glassEffect()
-//                        .glassEffectTransition(.materialize)
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.glassProminent)
                         
                         Button {
                             guard let img = vm.selectedImage else { return }
@@ -108,9 +135,7 @@ struct VisionView: View {
                                 .font(.system(size: 19, weight: .semibold))
                         }
                         .disabled(isDisabledAnalyseButton)
-                        .glassEffect()
-//                        .glassEffectTransition(.identity)
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.glassProminent)
                     }
                     if $vm.isLoading.wrappedValue {
                         HStack{
@@ -131,6 +156,12 @@ struct VisionView: View {
             guard let newValue else { return }
             vm.getPhotoItemAsImage(item: newValue)
         }
+        .sheet(isPresented: $showInfoSheet) {
+            InfoSheet(food: $vm.foodTotalTacoResult)
+                .presentationDetents([
+                    .height(180), .medium, .large
+                ])
+        }
     }
 }
 
@@ -138,10 +169,10 @@ struct VisionView: View {
     VisionView()
 }
 
-struct StatsRowView: View {
+struct NumberStatsRowView: View {
     
-    var title: String = "None"
-    var amount: Double = 0
+    var title: String
+    var amount: Double
     var unit: String = "g"
     
     
@@ -156,6 +187,32 @@ struct StatsRowView: View {
             Spacer()
             
             Text("\(String(format: "%.1f", amount)) \(unit)")
+                .font(.subheadline)
+                .bold()
+                .frame(width: 100)
+                .padding(.vertical, 12)
+                .glassEffect()
+        }
+    }
+}
+
+struct TextStatsRowView: View {
+    
+    var title: String
+    var content: String
+    
+    
+    var body: some View {
+        HStack{
+            Text(title)
+                .font(.body)
+                .frame(width: 175)
+                .padding(.vertical, 12)
+                .glassEffect()
+            
+            Spacer()
+            
+            Text(content)
                 .font(.subheadline)
                 .bold()
                 .frame(width: 100)

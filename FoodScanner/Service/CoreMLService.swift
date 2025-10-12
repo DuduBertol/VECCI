@@ -10,6 +10,10 @@ import CoreML
 import Vision
 import UIKit
 
+enum MLModelAvailableType {
+    case foodClassifier, vecci
+}
+
 class CoreMLService {
     
     private var model: VNCoreMLModel?
@@ -18,9 +22,15 @@ class CoreMLService {
         setupMLModel()
     }
     
-    private func setupMLModel() {
+    func setupMLModel(to model: MLModelAvailableType = .vecci) {
         do {
-            self.model = try VNCoreMLModel(for: FoodClassifier().model)
+            switch model {
+            case .foodClassifier:
+                self.model = try VNCoreMLModel(for: FoodClassifier().model)
+            case .vecci:
+                self.model = try VNCoreMLModel(for: VECCI().model)
+            }
+            
         } catch {
             print(error.localizedDescription)
         }

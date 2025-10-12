@@ -46,6 +46,12 @@ class ContentViewModel: ObservableObject {
         }
     }
     
+    func setMLModel(to model: MLModelAvailableType){
+        cleanUp()
+        coreMLService.setupMLModel(to: model)
+        foundationModelService.setupSession()
+    }
+    
     private func classifyImageandFetchResults(uiImage: UIImage) {
         
         do {

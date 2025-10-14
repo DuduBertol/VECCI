@@ -83,6 +83,21 @@ struct InfoSheet: View {
                     }
                 }
                 
+                Spacer()
+                
+                VStack(alignment: .leading){
+                    Text("""
+                        Todos as informações nutricionais são calculadas com base na Tabela Brasileira de Coposição de Alimentos (TACO):
+                    
+                    """)
+                        .font(.caption2)
+                        .foregroundStyle(.opacity(0.5))
+                    Link("Tabela TACO.pdf", destination: URL(string: "https://www.gov.br/agricultura/pt-br/assuntos/inspecao/produtos-vegetal/legislacao-de-produtos-origem-vegetal/biblioteca-de-normas-vinhos-e-bebidas/tabela-brasileira-de-composicao-de-alimentos_taco_2011.pdf")!)
+                        .font(.caption2)
+                        .foregroundStyle(.opacity(0.75))
+                        .underline()
+                }
+                
             }
             .padding(.horizontal, 16)
         }

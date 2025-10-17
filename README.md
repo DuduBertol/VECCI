@@ -1,3 +1,9 @@
+<img width="200" height="60" alt="image" src="https://github.com/user-attachments/assets/00369c62-8541-4e63-84c9-bb71e72af511" />
+
+[DOWNLOAD NOW - APP STORE](https://apps.apple.com/br/app/vecci/id6753762025?l=en-GB)
+
+
+
 <img width="1920" height="1080" alt="Thumb" src="https://github.com/user-attachments/assets/0fabb625-c29c-4a01-a75f-763860a61d88" />
 
 # 👁️ VECCI
